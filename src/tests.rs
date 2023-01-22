@@ -179,7 +179,7 @@ fn transformation_test() {
     let scale = vector::Vector3::new(2.0, 2.0, 2.0);
     let rotation = vector::Vector3::new(0.0, 0.0, PI/2.0);
     let translation = vector::Vector3::new(0.0, 2.0, 0.0);
-    let trs = transform::euler_rotation_matrix(rotation)*transform::scale_matrix(scale);
+    let trs = transform::translate_matrix(translation)*transform::euler_rotation_matrix(rotation)*transform::scale_matrix(scale);
     let new_point = trs * point;
     eprintln!("{}, {}", new_point, trs);
     assert!(vector::Vector3::new(new_point.x, new_point.y, new_point.z).mag() < 0.0001);
