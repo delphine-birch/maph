@@ -11,10 +11,10 @@ pub fn scale_matrix(s: Vector3<f32>) -> Mat4<f32> {
 
 pub fn translate_matrix(t: Vector3<f32>) -> Mat4<f32> {
     Mat4::new([
-        Vector4::new(0.0, 0.0, 0.0, 0.0),
-        Vector4::new(0.0, 0.0, 0.0, 0.0),
-        Vector4::new(0.0, 0.0, 0.0, 0.0),
-        Vector4::new(t.x, t.y, t.z, 1.0)
+        Vector4::new(1.0, 0.0, 0.0, t.x),
+        Vector4::new(0.0, 1.0, 0.0, t.y),
+        Vector4::new(0.0, 0.0, 1.0, t.z),
+        Vector4::new(0.0, 0.0, 0.0, 1.0)
     ])
 }
 
