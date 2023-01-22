@@ -27,6 +27,16 @@ where T : Default + Add<T, Output=T> + Sub<T, Output=T> + Mul<T, Output=T> + Div
 {
     fn default() -> Self { Self { data: [[T::default(); 2]; 2] }}
 }
+impl<T> Identity for Mat2<T>
+where T : Default + Add<T, Output=T> + Sub<T, Output=T> + Mul<T, Output=T> + Div<T, Output=T> + Copy + Identity
+{
+    fn identity() -> Self {
+        Self::new([
+            Vector2::new(T::identity(), T::default()),
+            Vector2::new(T::default(), T::identity()),
+        ])
+    }
+}
 impl<T> Display for Mat2<T>
 where T : Add<T, Output=T> + Sub<T, Output=T> + Mul<T, Output=T> + Div<T, Output=T> + Copy + Display {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -88,6 +98,17 @@ where T : Default + Add<T, Output=T> + Sub<T, Output=T> + Mul<T, Output=T> + Div
 {
     fn default() -> Self { Self { data: [[T::default(); 3]; 3] }}
 }
+impl<T> Identity for Mat3<T>
+where T : Default + Add<T, Output=T> + Sub<T, Output=T> + Mul<T, Output=T> + Div<T, Output=T> + Copy + Identity
+{
+    fn identity() -> Self {
+        Self::new([
+            Vector3::new(T::identity(), T::default(), T::default()),
+            Vector3::new(T::default(), T::identity(), T::default()),
+            Vector3::new(T::default(), T::default(), T::identity()),
+        ])
+    }
+}
 impl<T> Display for Mat3<T>
 where T : Add<T, Output=T> + Sub<T, Output=T> + Mul<T, Output=T> + Div<T, Output=T> + Copy + Display {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -148,6 +169,18 @@ impl<T> Default for Mat4<T>
 where T : Default + Add<T, Output=T> + Sub<T, Output=T> + Mul<T, Output=T> + Div<T, Output=T> + Copy
 {
     fn default() -> Self { Self { data: [[T::default(); 4]; 4] }}
+}
+impl<T> Identity for Mat4<T>
+where T : Default + Add<T, Output=T> + Sub<T, Output=T> + Mul<T, Output=T> + Div<T, Output=T> + Copy + Identity
+{
+    fn identity() -> Self {
+        Self::new([
+            Vector4::new(T::identity(), T::default(), T::default(), T::default()),
+            Vector4::new(T::default(), T::identity(), T::default(), T::default()),
+            Vector4::new(T::default(), T::default(), T::identity(), T::default()),
+            Vector4::new(T::default(), T::default(), T::default(), T::identity()),
+        ])
+    }
 }
 impl<T> Display for Mat4<T>
 where T : Add<T, Output=T> + Sub<T, Output=T> + Mul<T, Output=T> + Div<T, Output=T> + Copy + Display {
