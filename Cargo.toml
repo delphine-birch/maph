@@ -1,7 +1,7 @@
 [package]
 name = "maph"
 version = "0.1.0"
-edition = "2023"
+edition = "2021"
 license = "MIT"
 description = "Maths package for use with personal stuff, but like, you can totally use it! If you want! (You shouldn't)"
 repository = "https://github.com/delphine-birch/maph"
