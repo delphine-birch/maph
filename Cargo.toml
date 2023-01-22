@@ -1,7 +1,11 @@
 [package]
 name = "maph"
 version = "0.1.0"
-edition = "2021"
+edition = "2023"
+license = "MIT"
+description = "Maths package for use with personal stuff, but like, you can totally use it! If you want! (You shouldn't)"
+repository = "https://github.com/delphine-birch/maph"
+readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
