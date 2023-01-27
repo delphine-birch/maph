@@ -71,11 +71,13 @@ pub fn from_euler(x: f32, y: f32, z: f32, axis_order: RotationOrder) -> Vector<4
     compose(quats[2], compose(quats[1], quats[0]))
 }
 
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum EulerAxis {
     X,
     Y,
     Z
 }
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct RotationOrder([EulerAxis; 3]);
 impl RotationOrder {
     pub fn xyz() -> Self { Self([EulerAxis::X, EulerAxis::Y, EulerAxis::Z]) }

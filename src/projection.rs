@@ -13,7 +13,7 @@ pub fn to_camera_space() -> Matrix<4, 4> {
         ]
     )
 }
-
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct PerspectiveInfo {
     aspect_ratio: f32,
     fovy: f32,
