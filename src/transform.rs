@@ -1,78 +1,30 @@
-use crate::{vector::*, matrix::*};
-
-pub fn scale_matrix(s: Vector3<f32>) -> Mat4<f32> {
-    Mat4::new([
-        Vector4::new(s.x, 0.0, 0.0, 0.0),
-        Vector4::new(0.0, s.y, 0.0, 0.0),
-        Vector4::new(0.0, 0.0, s.z, 0.0),
-        Vector4::new(0.0, 0.0, 0.0, 1.0)
-    ])
+use crate::base::*;
+use crate::identity::Identity;
+use crate::rotation::*;
+pub fn from_translate(t: Vector<3>) -> Matrix<4, 4> {
+    let mut mat = Matrix::<4, 4>::identity();
+    mat[0][3] = t[0];
+    mat[1][3] = t[1];
+    mat[2][3] = t[2];
+    mat
 }
-
-pub fn translate_matrix(t: Vector3<f32>) -> Mat4<f32> {
-    Mat4::new([
-        Vector4::new(1.0, 0.0, 0.0, t.x),
-        Vector4::new(0.0, 1.0, 0.0, t.y),
-        Vector4::new(0.0, 0.0, 1.0, t.z),
-        Vector4::new(0.0, 0.0, 0.0, 1.0)
-    ])
+pub fn from_scale(s: Vector<3>) -> Matrix<4, 4> {
+    let mut mat = Matrix::<4, 4>::identity();
+    mat[0][0] = s[0];
+    mat[1][1] = s[1];
+    mat[2][2] = s[2];
+    mat
 }
-
-pub fn x_rotation_matrix(a: f32) -> Mat4<f32> {
-    Mat4::new([
-        Vector4::new(1.0, 0.0, 0.0, 0.0),
-        Vector4::new(0.0, a.cos(), a.sin(), 0.0),
-        Vector4::new(0.0, -a.sin(), a.cos(), 0.0),
-        Vector4::new(0.0, 0.0, 0.0, 1.0)
-    ])
+pub fn from_rotate(q: Vector<4>) -> Matrix<4, 4> {
+    let mut mat = Matrix::<4, 4>::identity();
+    let rot = quat_to_matrix(q);
+    for i in 0..3 {
+        for j in 0..3 {
+            mat[i][j] = rot[i][j]
+        }
+    }
+    mat
 }
-
-pub fn y_rotation_matrix(a: f32) -> Mat4<f32> {
-    Mat4::new([
-        Vector4::new(a.cos(), 0.0, -a.sin(), 0.0),
-        Vector4::new(0.0, 1.0, 0.0, 0.0),
-        Vector4::new(a.sin(), 0.0, a.cos(), 0.0),
-        Vector4::new(0.0, 0.0, 0.0, 1.0)
-    ])
-}
-
-pub fn z_rotation_matrix(a: f32) -> Mat4<f32> {
-    Mat4::new([
-        Vector4::new(a.cos(), a.sin(), 0.0, 0.0),
-        Vector4::new(-a.sin(), a.cos(), 0.0, 0.0),
-        Vector4::new(0.0, 0.0, 1.0, 0.0),
-        Vector4::new(0.0, 0.0, 0.0, 1.0),
-    ])
-}
-
-pub fn euler_rotation_matrix(a: Vector3<f32>) -> Mat4<f32> {
-    x_rotation_matrix(a.x)*y_rotation_matrix(a.y)*z_rotation_matrix(a.z)
-}
-
-pub fn rotation_matrix(q: Vector4<f32>) -> Mat4<f32> {
-    Mat4::new([
-        Vector4::new(1.0 - 2.0*q.x*q.x - 2.0*q.y*q.y, 2.0*q.y*q.z + 2.0*q.x*q.w, 2.0*q.z*q.z - 2.0*q.y*q.w, 0.0),
-        Vector4::new(2.0*q.y*q.z - 2.0*q.x*q.w, 1.0 - 2.0*q.x*q.x - 2.0*q.z*q.z, 2.0*q.x*q.y + 2.0*q.z*q.w, 0.0),
-        Vector4::new(2.0*q.x*q.z + 2.0*q.y*q.w, 2.0*q.x*q.y - 2.0*q.z*q.w, 1.0 - 2.0*q.y*q.y - 2.0*q.z*q.z, 0.0),
-        Vector4::new(0.0, 0.0, 0.0, 1.0)
-    ])
-}
-
-pub fn perpective_matrix(fov: f32, aspect_ratio: f32, near: f32, far: f32) -> Mat4<f32> {
-    let s = 1.0/(fov/2.0).tan();
-    Mat4::new([
-        Vector4::new(s/aspect_ratio, 0.0, 0.0, 0.0),
-        Vector4::new(0.0, s, 0.0, 0.0),
-        Vector4::new(0.0, 0.0, (-near-far)/(near-far), (2.0*near*far)/(near-far)),
-        Vector4::new(0.0, 0.0, 1.0, 0.0)
-    ])
-}
-
-pub fn orthographic_matrix(top: f32, bottom: f32, left: f32, right: f32, near: f32, far: f32) -> Mat4<f32> {
-    Mat4::new([
-        Vector4::new(2.0/(right-left), 0.0, 0.0, (-right-left)/(right-left)),
-        Vector4::new(0.0, 2.0/(top-bottom), 0.0, (-top-bottom)/(top-bottom)),
-        Vector4::new(0.0, 0.0, -2.0/(far-near), (-far-near)/(far-near)),
-        Vector4::new(0.0, 0.0, 0.0, 1.0)
-    ])
+pub fn from_trs(t: Vector<3>, r: Vector<4>, s: Vector<3>) -> Matrix<4, 4> {
+    from_translate(t)*from_rotate(r)*from_scale(s)
 }
