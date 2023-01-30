@@ -50,6 +50,20 @@ impl<const L: usize> Vector<L> {
         }
         Self { data }
     }
+    pub fn sum(&self) -> f32 {
+        let mut sum = 0.0;
+        for i in 0..L { sum += self[i] }
+        sum
+    }
+    pub fn sq_sum(&self) -> f32 {
+        let mut sum = 0.0;
+        for i in 0..L { sum += self[i]*self[i] }
+        sum
+    }
+    pub fn mag(&self) -> f32 {
+        self.sq_sum().sqrt()
+    }
+    pub fn normalised(&self) -> Self { *self/self.mag() }
 }
 
 impl<const L: usize> Display for Vector<L> {

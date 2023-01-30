@@ -11,6 +11,14 @@ pub fn compose(r: Vector<4>, s: Vector<4>) -> Vector<4> {
     ])
 }
 
+pub fn cross(a: Vector<3>, b: Vector<3>) -> Vector<3> {
+    Vector::<3>::new([
+        a[1]*b[2] - a[2]*b[1],
+        a[2]*b[0] - a[0]*b[2],
+        a[0]*b[1] - a[1]*b[0]
+    ])
+}
+
 pub fn from_axis_angle(axis: Vector<3>, angle: f32) -> Vector<4> {
     let half_angle = angle/2.0;
     Vector::<4>::new([
@@ -69,6 +77,15 @@ pub fn from_euler(x: f32, y: f32, z: f32, axis_order: RotationOrder) -> Vector<4
         }
     }
     compose(quats[2], compose(quats[1], quats[0]))
+}
+
+pub fn look_at(from: Vector<3>, to: Vector<3>, facing: Vector<3>, up: Vector<3>, forward: Vector<3>) -> Vector<4> {
+    let diff = (to - from).normalised();
+    let mut rot_axis = cross(facing, diff).normalised();
+    if rot_axis.sq_sum() == 0.0 { rot_axis = up }
+    let dot = forward.dot(to);
+    let ang = dot.acos();
+    from_axis_angle(rot_axis, ang)
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]
