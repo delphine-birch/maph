@@ -3,8 +3,8 @@ use crate::base::*;
 #[repr(C)]
 #[derive(Copy, Clone, Debug, bytemuck::Pod, bytemuck::Zeroable)]
 pub struct Float2 {
-    x: f32,
-    y: f32,
+    pub x: f32,
+    pub y: f32,
 }
 impl Float2 {
     pub fn new(x: f32, y: f32) -> Self { Self { x, y } }
@@ -17,9 +17,9 @@ impl From<Vector<2>> for Float2 { fn from(other: Vector<2>) -> Self { Self { x: 
 #[repr(C)]
 #[derive(Copy, Clone, Debug, bytemuck::Pod, bytemuck::Zeroable)]
 pub struct Float3 {
-    x: f32,
-    y: f32,
-    z: f32,
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
 }
 impl Float3 {
     pub fn new(x: f32, y: f32, z: f32) -> Self { Self { x, y, z } }
@@ -32,10 +32,10 @@ impl From<Vector<3>> for Float3 { fn from(other: Vector<3>) -> Self { Self { x: 
 #[repr(C)]
 #[derive(Copy, Clone, Debug, bytemuck::Pod, bytemuck::Zeroable)]
 pub struct Float4 {
-    x: f32,
-    y: f32,
-    z: f32,
-    w: f32,
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
+    pub w: f32,
 }
 impl Float4 {
     pub fn new(x: f32, y: f32, z: f32, w: f32) -> Self { Self { x, y, z, w } }

@@ -5,7 +5,7 @@ use crate::identity::Identity;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Vector<const L: usize> {
-    data: [f32; L],
+    pub data: [f32; L],
 }
 impl<const L: usize> Vector<L> {
     pub fn new(data: [f32; L]) -> Self { Self { data } }
@@ -121,7 +121,7 @@ impl<const L: usize> Div<Vector<L>> for Vector<L> {
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Matrix<const R: usize, const C: usize> {
-    data: [[f32; C]; R],
+    pub data: [[f32; C]; R],
 }
 impl<const R: usize, const C: usize> Matrix<R, C> {
     pub fn new(data: [[f32; C]; R]) -> Self { Self { data } }
