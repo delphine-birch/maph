@@ -71,9 +71,9 @@ pub fn from_euler(x: f32, y: f32, z: f32, axis_order: RotationOrder) -> Vector<4
     let mut quats = [Vector::<4>::identity(); 3];
     for i in 0..3 { 
         quats[i] = match axis_order.0[i] {
-            EulerAxis::X => from_x_angle(x),
-            EulerAxis::Y => from_y_angle(y),
-            EulerAxis::Z => from_z_angle(z)
+            EulerAxis::X => from_x_angle(-x),
+            EulerAxis::Y => from_y_angle(-y),
+            EulerAxis::Z => from_z_angle(-z)
         }
     }
     compose(quats[2], compose(quats[1], quats[0]))

@@ -1,13 +1,14 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
+use std::f32::consts::PI;
 use bimap::BiHashMap;
 use crate::base::Vector;
 use crate::hashvector::HashVector;
 
 pub struct VectorGraph<const N: usize, const P: usize> {
-    points: BiHashMap<usize, HashVector<N, P>>,
-    connections: HashMap<usize, Vec<usize>>,
-    counter: usize,
-    free: Vec<usize>,
+    pub points: BiHashMap<usize, HashVector<N, P>>,
+    pub connections: HashMap<usize, Vec<usize>>,
+    pub counter: usize,
+    pub free: Vec<usize>,
 }
 
 impl<const N: usize, const P: usize> VectorGraph<N, P> {
@@ -31,7 +32,9 @@ impl<const N: usize, const P: usize> VectorGraph<N, P> {
         self.connections.insert(id, Vec::new());
     }
     pub fn remove(&mut self, point: Vector<N>) -> bool {
-        self.points.remove_by_right(&HashVector::new(point)).is_some()
+        if let Some((id, _hv)) = self.points.remove_by_right(&HashVector::new(point)) {
+            self.free.push(id); return true;
+        } else { return false; }
     }
     pub fn connect(&mut self, point_a: Vector<N>, point_b: Vector<N>, bidir: bool) -> bool {
         match (self.points.get_by_right(&HashVector::new(point_a)), self.points.get_by_right(&HashVector::new(point_b))) {
@@ -81,62 +84,81 @@ impl<const N: usize, const P: usize> VectorGraph<N, P> {
 }
 
 impl<const P: usize> VectorGraph<2, P> {
-    pub fn triangulate(&mut self) {
-        self.connections = HashMap::new();
-        let mut av = Vector::<2>::default();
-        let mut max = 0.0;
-        for (_id, point) in &self.points {
-            let v = point.as_vector();
-            av = av + v;
+    pub fn triangulate(points: &[Vector<2>]) -> Self {
+        let mut vg = Self::new();
+
+        let mut p = crate::Vector2::default();
+        for point in points {   
+            if point.mag() > p.mag() { p = *point; }
         }
-        av = av / self.points.len() as f32;
-        for (_id, point) in &self.points {
-            let v = point.as_vector();
-            let m = (v - av).mag();
-            if m > max { max = m; }
-        }
-        max += 1.0;
-        let sup_tri = crate::geom::unit_geom::<3>(max);
-        let mut tris = vec![sup_tri];
-        for (_id, point) in &self.points {
-            let mut new_tris = Vec::new();
-            let mut bad_tris = Vec::new();
-            let v = point.as_vector();
-            for tri in &tris {
-                let circum = crate::geom::circum_centre(tri[0], tri[1], tri[2]);
-                let rad = (tri[0] - circum).mag();
-                let dist = (v - circum).mag();
+        let a = p*2.0;
+        let b = crate::geom::rotate(a, 2.0 * PI/3.0);
+        let c = crate::geom::rotate(a, -2.0 * PI/3.0);
+        let supra_tri = [a, b, c];
+
+        let mut tris = vec![supra_tri];
+        for point in points {
+            let (mut good, mut bad) = (Vec::new(), Vec::new());
+            for tri in tris {
+                let circum_centre = crate::geom::circum_centre(tri[0], tri[1], tri[2]);
+                let rad = (tri[0] - circum_centre).mag();
+                let dist = (*point - circum_centre).mag();
                 match dist < rad {
-                    true => { bad_tris.push(*tri); },
-                    false => { new_tris.push(*tri); }
+                    true => { bad.push(tri); }
+                    false => { good.push(tri); }
                 }
             }
-            for tri in &bad_tris {
-                new_tris.push([tri[0], tri[1], v]);
-                new_tris.push([tri[1], tri[2], v]);
-                new_tris.push([tri[2], tri[3], v]);
-                
+            let mut edges = Vec::new();
+            for tri in bad {
+                let a = HashVector::<2, 5>::new(tri[0]);
+                let b = HashVector::<2, 5>::new(tri[1]);
+                let c = HashVector::<2, 5>::new(tri[2]);
+                let mut is_in = (None, None, None);
+                for (i, &edge) in edges.iter().enumerate() {
+                    if edge == (a, b) || edge == (b, a) { is_in.0 = Some(i); }
+                    if edge == (b, c) || edge == (c, b) { is_in.1 = Some(i); }
+                    if edge == (c, a) || edge == (a, c) { is_in.2 = Some(i); }
+                }
+                let mut rem = Vec::new();
+                match is_in.0 {
+                    Some(index) => { rem.push(index); }
+                    None => { edges.push((a, b)); }
+                }
+                match is_in.1 {
+                    Some(index) => { rem.push(index); }
+                    None => { edges.push((b, c)); }
+                }
+                match is_in.2 {
+                    Some(index) => { rem.push(index); }
+                    None => { edges.push((c, a)); }
+                }
+                rem.sort();
+                for (i, j) in rem.iter().enumerate() {
+                    edges.remove(j - i);
+                }
             }
-            tris = new_tris;
+            for edge in edges {
+                good.push([edge.0.as_vector(), edge.1.as_vector(), *point])
+            }
+            tris = good;
         }
+        let mut points = HashSet::new();
         for tri in &tris {
-            let mut n = 0;
-            if tri[0] == sup_tri[0] || tri[0] == sup_tri[1] || tri[0] == sup_tri[2] { n += 1; }
-            if tri[1] == sup_tri[0] || tri[1] == sup_tri[1] || tri[1] == sup_tri[2] { n += 1; }
-            if tri[2] == sup_tri[0] || tri[2] == sup_tri[1] || tri[2] == sup_tri[2] { n += 1; }
-            if n < 2 {
-                let hva = HashVector::<2, P>::new(tri[0]);
-                let hvb = HashVector::<2, P>::new(tri[1]);
-                let hvc = HashVector::<2, P>::new(tri[2]);
-                match (self.points.get_by_right(&hva), self.points.get_by_right(&hvb), self.points.get_by_right(&hvc)) {
-                    (Some(a), Some(b), Some(c)) => {
-                        if let Some(al) = self.connections.get_mut(a) { al.push(*b); al.push(*c); }
-                        if let Some(bl) = self.connections.get_mut(a) { bl.push(*a); bl.push(*c); }
-                        if let Some(cl) = self.connections.get_mut(a) { cl.push(*a); cl.push(*b); }
-                    },
-                    _ => {},
-                }
-            }
+            points.insert(HashVector::<2, 5>::new(tri[0]));
+            points.insert(HashVector::<2, 5>::new(tri[1]));
+            points.insert(HashVector::<2, 5>::new(tri[2]));
         }
+        eprintln!("Found Supra Tri 0? {}", points.remove(&HashVector::<2, 5>::new(supra_tri[0])));
+        eprintln!("Found Supra Tri 1? {}", points.remove(&HashVector::<2, 5>::new(supra_tri[1])));
+        eprintln!("Found Supra Tri 2? {}", points.remove(&HashVector::<2, 5>::new(supra_tri[2])));
+
+        for point in points { vg.insert(point.as_vector()); }
+        for tri in &tris {
+            vg.connect(tri[0], tri[1], true);
+            vg.connect(tri[1], tri[2], true);
+            vg.connect(tri[2], tri[0], true);
+        }
+
+        vg
     }
 }
