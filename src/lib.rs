@@ -1,12 +1,14 @@
 pub mod modulo;
 pub mod base;
-pub mod sqroot;
-pub mod identity;
 pub mod spline;
 pub mod cg;
 pub mod transform;
 pub mod rotation;
 pub mod projection;
+pub mod hashvector;
+pub mod vectorgraph;
+pub mod num;
+pub mod geom;
 #[cfg(test)]
 pub mod tests;
 

@@ -1,4 +1,4 @@
-use crate::{base::*, identity::Identity};
+use crate::{base::*, num::Identity};
 
 pub fn quaternion_identity() -> Vector<4> { Vector::<4>::new([0.0, 0.0, 0.0, 1.0]) }
 

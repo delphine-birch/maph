@@ -25,7 +25,7 @@ pub struct Spline<const N: usize>
 }
 impl<const N: usize> Spline<N>
 {
-    pub fn new(&self, mat: Matrix<4, 4>, points: Vec<Vector<N>>) -> Self {
+    pub fn new(mat: Matrix<4, 4>, points: Vec<Vector<N>>) -> Self {
         let mut segments = VecDeque::new();
         for i in 0..points.len()/4 {
             if let (Some(a), Some(b), Some(c), Some(d)) = (points.get(i*4), points.get(i*4 + 1), points.get(i*4 + 2), points.get(i*4 + 3)) {

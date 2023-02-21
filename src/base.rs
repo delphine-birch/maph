@@ -1,7 +1,7 @@
 use std::ops::{Add, Sub, Mul, Div, Index, IndexMut};
 use std::fmt; 
 use std::fmt::Display;
-use crate::identity::Identity;
+use crate::num::Identity;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Vector<const L: usize> {

@@ -1,5 +1,5 @@
 use crate::base::*;
-use crate::identity::Identity;
+use crate::num::Identity;
 use crate::rotation::*;
 pub fn from_translate(t: Vector<3>) -> Matrix<4, 4> {
     let mut mat = Matrix::<4, 4>::identity();
