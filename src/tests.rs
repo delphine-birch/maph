@@ -1,6 +1,7 @@
 use std::f32::consts::PI;
+use std::str::FromStr;
 
-use crate::{base::*};
+use crate::geom::{vector::*, matrix::*};
 fn equal_ish(a: f32, b: f32, d: f32) -> bool {
     (a - b).abs() < d
 }
@@ -17,12 +18,35 @@ fn mat_equal_ish<const R: usize, const C: usize>(a: Matrix<R, C>, b: Matrix<R, C
     true
 }
 #[test]
+fn rational_test() {
+    use crate::num::rational::*;
+    assert!(format!("{}", r32::from_str("-0.3").unwrap()) == "-3/10");
+    let a = (Vector::<3>::new([0.1, 0.2, 0.3]), Vector::<3>::new([0.4, 0.5, 0.6]), Vector::<3>::new([0.7, 0.8, 0.9]));
+    let b = (VectorPrecise::<3>::new([r32::from(0.1), r32::from(0.2), r32::from(0.3)]), VectorPrecise::<3>::new([r32::from(0.4), r32::from(0.5), r32::from(0.6)]), VectorPrecise::<3>::new([r32::from(0.7), r32::from(0.8), r32::from(0.9)]));
+    assert!(vec_equal_ish(a.0*(a.1 + a.2)/a.1, Vector::<3>::from(b.0*(b.1 + b.2)/b.1), 0.0001));
+}
+#[test]
+fn gcd_test() {
+    assert!(crate::num::factors::gcd32(35, 10) == 5);
+    assert!(crate::num::factors::gcd32(156, 36) == 12);
+}
+#[test]
+fn factor_test() {
+    assert!(crate::num::factors::fac32(24) == vec!(2, 2, 2, 3))
+}
+#[test]
+fn sqrt_test() {
+    use crate::num::rational::*;
+    eprintln!("{}", r32::from((25, 7)).surd_sqrt());
+    assert!(r32::from((25, 7)).surd_sqrt().squared() == r32::from((25, 7)));
+}
+#[test]
 fn quaternion_composition() {
     let a = Vector::<4>::new([0.4, 0.3, 0.2, 0.5]);
     let b = Vector::<4>::new([0.5, 0.4, 0.3, 0.6]);
     let c = Vector::<4>::new([0.5, 0.36, 0.28, -0.08]);
-    eprintln!("{}", crate::rotation::compose(a, b));
-    assert!(vec_equal_ish(crate::rotation::compose(a, b), c, 0.001));
+    eprintln!("{}", crate::geom::transforms::quaternion::compose(a, b));
+    assert!(vec_equal_ish(crate::geom::transforms::quaternion::compose(a, b), c, 0.001));
 }
 
 //Vector Dot
@@ -169,8 +193,16 @@ fn vec_matrix_mul() {
     assert!(vec_equal_ish(vec*mat, Vector::<4>::new([58.0, 54.0, 50.0, 46.0]), 0.001)); 
 }
 //Axis Angle
+#[test]
+fn axis_angle() {
+    let axis = Vector::<3>::new([0.5, 0.6, 0.7]).normalised();
+    let angle = 0.53;
+    let quat = crate::geom::transforms::quaternion::from_axis_angle(axis, angle);
+    let aa_rev = crate::geom::transforms::quaternion::to_axis_angle(quat);
+    assert!(vec_equal_ish(aa_rev.0, axis, 0.001));
+    assert!(equal_ish(aa_rev.1, angle, 0.001));
+}
 
-//Transform Tests
 //TRS
 #[test]
 fn transformation_test() {
@@ -178,24 +210,20 @@ fn transformation_test() {
     let scale = Vector::<3>::new([2.0, 2.0, 2.0]);
     let rotation = Vector::<3>::new([0.0, 0.0, PI/2.0]);
     let translation = Vector::<3>::new([0.0, 2.0, 0.0]);
-    let trs = crate::transform::from_trs(translation, crate::rotation::from_euler(rotation[0], rotation[1], rotation[2], crate::rotation::RotationOrder::xyz()), scale);
+    let trs = crate::geom::transforms::transform_mat::from_trs(translation, crate::geom::transforms::quaternion::from_euler(rotation[0], rotation[1], rotation[2], crate::geom::transforms::RotationOrder::xyz()), scale);
     let new_point = trs * point;
     eprintln!("{}, {}", new_point, trs);
     assert!(Vector::<3>::new([new_point[0], new_point[1], new_point[2]]).mag() < 0.001);
 }
 
-//Projection Tests
-
 //Projection
+
 //Orthographic
 
 //CG Tests
 
-//Create Vectors
-//Create Matrices
-
 #[test]
-fn matrix_test() {
+fn matrix_identity() {
     let mat1 = Matrix::<3, 3>::new([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0 , 0.0, 1.0]]);
     let mat2 = Matrix::<3, 1>::new([[4.0], [5.0], [6.0]]);
     assert!(mat1.multiply(mat2) == mat2);

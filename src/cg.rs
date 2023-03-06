@@ -1,4 +1,4 @@
-use crate::base::*;
+use crate::geom::{vector::*, matrix::*};
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug, bytemuck::Pod, bytemuck::Zeroable)]

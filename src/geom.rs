@@ -1,6 +1,11 @@
+pub mod spline;
+pub mod transforms;
+pub mod vector;
+pub mod matrix;
+
 use std::f32::consts::TAU;
 
-use crate::base::Vector;
+use crate::geom::{vector::*};
 
 pub fn cross(a: Vector<3>, b: Vector<3>) -> Vector<3> {
     let x = a[1]*b[2] - a[2]*b[1];
@@ -98,3 +103,4 @@ pub fn point_in_poly(p: Vector<2>, v: &[Vector<2>]) -> bool {
 pub fn dist_to_plane(point: Vector<3>, plane_point: Vector<3>, plane_normal: Vector<3>) -> f32 {
     (point - plane_point).dot(plane_normal)
 }
+
