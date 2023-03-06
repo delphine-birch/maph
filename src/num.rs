@@ -1,3 +1,8 @@
+pub mod rational;
+pub mod factors;
+pub mod surd;
+
+///Square Root trait for convenience.
 pub trait Sqroot {
     fn sqroot(&self) -> Self;
 }
@@ -15,6 +20,7 @@ impl Sqroot for i32 { fn sqroot(&self) -> Self { (*self as f64).sqrt().floor() a
 impl Sqroot for i16 { fn sqroot(&self) -> Self { (*self as f64).sqrt().floor() as i16 }}
 impl Sqroot for i8 { fn sqroot(&self) -> Self { (*self as f64).sqrt().floor() as i8 }}
 
+///Identity trait - should return a valid identity for structs it is implemented for. Implemented to return 1 for most number types.
 pub trait Identity {
     fn identity() -> Self;
 }
@@ -32,9 +38,11 @@ impl Identity for i32 { fn identity() -> Self { 1 }}
 impl Identity for i16 { fn identity() -> Self { 1 }}
 impl Identity for i8 { fn identity() -> Self { 1 }}
 
+///Trait for mod_add operation - this adds two items and then modulates them to the range provided by the boundaries argument (inclusive at both ends).
+///Implemented by default for anything that implements Copy, PartialOrd and Add and Sub for itself.
 pub trait ModuloAdd<T, Output> {
     fn mod_add(&self, other: T, boundaries: (T, T)) -> Output;
-    fn mod_add_eq(&mut self, other: T, boundaries: (T, T));
+    fn mod_add_assign(&mut self, other: T, boundaries: (T, T));
 }
 
 impl<T> ModuloAdd<T, T> for T
@@ -45,7 +53,7 @@ where T : Copy + std::ops::Add<T, Output=T> + std::ops::Sub<T, Output=T> + Parti
         while n < boundaries.0 { n = n + (boundaries.1 - boundaries.0); }
         n
     }
-    fn mod_add_eq(&mut self, other: T, boundaries: (T, T)) {
+    fn mod_add_assign(&mut self, other: T, boundaries: (T, T)) {
         *self = self.mod_add(other, boundaries);
     }
 }
