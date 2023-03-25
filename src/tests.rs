@@ -1,7 +1,7 @@
 use std::f32::consts::PI;
 use std::str::FromStr;
 
-use crate::geom::{vector::*, matrix::*};
+use crate::geom::{vector::*, matrix::*, quaternion::{Quaternion, DualQuaternion}};
 fn equal_ish(a: f32, b: f32, d: f32) -> bool {
     (a - b).abs() < d
 }
@@ -42,11 +42,11 @@ fn sqrt_test() {
 }
 #[test]
 fn quaternion_composition() {
-    let a = Vector::<4>::new([0.4, 0.3, 0.2, 0.5]);
-    let b = Vector::<4>::new([0.5, 0.4, 0.3, 0.6]);
-    let c = Vector::<4>::new([0.5, 0.36, 0.28, -0.08]);
-    eprintln!("{}", crate::geom::transforms::quaternion::compose(a, b));
-    assert!(vec_equal_ish(crate::geom::transforms::quaternion::compose(a, b), c, 0.001));
+    let a = Quaternion::new(0.4, 0.3, 0.2, 0.5);
+    let b = Quaternion::new(0.5, 0.4, 0.3, 0.6);
+    let c = Quaternion::new(0.5, 0.36, 0.28, -0.08);
+    eprintln!("{}", Vector::<4>::from(a*b));
+    assert!(vec_equal_ish(Vector::<4>::from(a*b), Vector::<4>::from(c), 0.001));
 }
 
 //Vector Dot
@@ -197,8 +197,8 @@ fn vec_matrix_mul() {
 fn axis_angle() {
     let axis = Vector::<3>::new([0.5, 0.6, 0.7]).normalised();
     let angle = 0.53;
-    let quat = crate::geom::transforms::quaternion::from_axis_angle(axis, angle);
-    let aa_rev = crate::geom::transforms::quaternion::to_axis_angle(quat);
+    let quat = Quaternion::from_axis_angle(axis, angle);
+    let aa_rev = quat.to_axis_angle();
     assert!(vec_equal_ish(aa_rev.0, axis, 0.001));
     assert!(equal_ish(aa_rev.1, angle, 0.001));
 }
@@ -210,10 +210,16 @@ fn transformation_test() {
     let scale = Vector::<3>::new([2.0, 2.0, 2.0]);
     let rotation = Vector::<3>::new([0.0, 0.0, PI/2.0]);
     let translation = Vector::<3>::new([0.0, 2.0, 0.0]);
-    let trs = crate::geom::transforms::transform_mat::from_trs(translation, crate::geom::transforms::quaternion::from_euler(rotation[0], rotation[1], rotation[2], crate::geom::transforms::RotationOrder::xyz()), scale);
+    let trs = crate::geom::transforms::transform_mat::from_trs(translation, Quaternion::from_euler(rotation[0], rotation[1], rotation[2], crate::geom::transforms::RotationOrder::xyz()), scale);
     let new_point = trs * point;
-    eprintln!("{}, {}", new_point, trs);
+    //eprintln!("{}, {}", new_point, trs);
     assert!(Vector::<3>::new([new_point[0], new_point[1], new_point[2]]).mag() < 0.001);
+    let scaled_point = Vector::<4>::new([2.0, 0.0, 0.0, 1.0]);
+    let dual_quat = DualQuaternion::from_rotate_translate(Quaternion::from_euler(rotation[0], rotation[1], rotation[2], crate::geom::transforms::RotationOrder::xyz()), translation);
+    //let dual_rot = DualQuaternion::from_quat(Quaternion::from_euler(rotation[0], rotation[1], rotation[2], crate::geom::transforms::RotationOrder::xyz()));
+    //let dual_trans = DualQuaternion::from_translate(translation);
+    let dual_point = dual_quat.transform(scaled_point);
+    assert!(Vector::<3>::new([dual_point[0], dual_point[1], dual_point[2]]).mag() < 0.001);
 }
 
 //Projection

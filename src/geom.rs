@@ -2,6 +2,7 @@ pub mod spline;
 pub mod transforms;
 pub mod vector;
 pub mod matrix;
+pub mod quaternion;
 
 use std::f32::consts::TAU;
 
