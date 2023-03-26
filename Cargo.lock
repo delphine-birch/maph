@@ -295,7 +295,7 @@ dependencies = [
 
 [[package]]
 name = "maph"
-version = "0.7.25"
+version = "0.7.3"
 dependencies = [
  "bimap",
  "bytemuck",

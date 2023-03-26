@@ -1,6 +1,8 @@
 use std::ops::{Mul, Add, MulAssign, AddAssign};
 
-use crate::{Vector, num::Identity};
+use crate::{Vector, num::{Identity, Magnitude}, Matrix};
+
+use super::transforms::transform_mat::from_trs;
 
 ///Quaternion type - analogous to Vector<4>, although keeps its components individually rather than in an array - convert to and from for
 ///quaternion operations vs. vector operations.
@@ -133,6 +135,13 @@ impl Quaternion {
             ],
         ])
     }
+    pub fn normalise(&self) -> Self {
+        self * (1.0/self.mag())
+    }
+}
+impl Magnitude for Quaternion {
+    type Output = f32;
+    fn mag(&self) -> f32 { Vector::<4>::from(*self).mag() }
 }
 
 impl Mul<Quaternion> for Quaternion {
@@ -282,8 +291,14 @@ impl DualQuaternion {
     pub fn muls(&self, other: DualQuaternion) -> Self {
         Self {
             real: self.real * other.real,
-            dual: (self.real * other.dual) + (self.dual * other.real)
+            dual: self.real * other.dual + self.dual * other.real
         }
+    }
+    pub fn inverse(&self) -> Self {
+        Self::from_quats(
+            self.real.conjugate(),
+            -1.0 * self.real.conjugate() * self.dual * self.real.conjugate()
+        ).normalise()
     }
     ///Returns the Conjugate of the Dual Quaternion. Note - there are three different ways of taking the conjugate of a
     ///dual quaternion, but this is the most common and combines the other two, which are individually also available as dual_conjugate() and quaternion_conjugate().
@@ -308,6 +323,10 @@ impl DualQuaternion {
         let v4 = Vector::<4>::from(self.real);
         let d4 = Vector::<4>::from(self.dual);
         (v4.mag(), 2.0 * v4.dot(d4))
+    }
+    pub fn normalise(&self) -> Self {
+        let mag = self.magnitude().0;
+        Self::from_quats(self.real*(1.0/mag), self.dual*(1.0/mag))
     }
     ///Returns a Dual Quaternion from a Quaternion rotation
     pub fn from_quat(q: Quaternion) -> Self {
@@ -334,6 +353,14 @@ impl DualQuaternion {
             0.5 * (q * Quaternion::new(t[0], t[1], t[2], 1.0))
         )
     }
+    pub fn to_matrix(&self) -> Matrix::<4, 4> { 
+        let t = self.translation();
+        from_trs(
+            Vector::<3>::new([t[0], t[1], t[2]]),
+            self.rotation(),
+            Vector::<3>::new([1.0, 1.0, 1.0])
+        )
+    }
     ///Returns the rotation only of a Dual Quaternion.
     pub fn rotation(&self) -> Quaternion {
         self.real
@@ -351,6 +378,11 @@ impl DualQuaternion {
         let new = self.mul(dual).mul(self.conjugate());
         Vector::<4>::from(new.dual)
     }
+}
+
+impl Magnitude for DualQuaternion {
+    type Output = (f32, f32);
+    fn mag(&self) -> (f32, f32) { self.magnitude() }
 }
 
 impl Mul<DualQuaternion> for DualQuaternion {

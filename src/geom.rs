@@ -5,6 +5,7 @@ pub mod matrix;
 pub mod quaternion;
 
 use std::f32::consts::TAU;
+use crate::num::Magnitude;
 
 use crate::geom::{vector::*};
 

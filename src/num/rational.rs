@@ -3,7 +3,8 @@ use std::fmt::{Display, Formatter};
 use std::num::{ParseIntError};
 use std::str::FromStr;
 use std::ops::{Add, Sub, Mul, Div, AddAssign, SubAssign, MulAssign, DivAssign, Neg, BitXor};
-use super::{Identity, Sqroot};
+use super::surd::{surd32, surd64};
+use super::{Identity, Sqroot, Magnitude};
 
 ///Rational number type based on two u32s and a bool. Contains sign, numerator and denominator.
 #[allow(non_camel_case_types)]
@@ -60,10 +61,14 @@ impl Identity for r32 {
     fn identity() -> Self { Self::new(true, 1, 1) }
 }
 impl Sqroot for r32 {
-    fn sqroot(&self) -> Self {
-        let surd = self.surd_sqrt();
-        surd.coef() * Self::from((surd.radicand() as f32).sqrt())
+    type Output = surd32;
+    fn sqroot(&self) -> surd32 {
+        self.surd_sqrt()
     }
+}
+impl Magnitude for r32 {
+    type Output = r32;
+    fn mag(&self) -> r32 { self.abs() }
 }
 impl PartialOrd for r32 {
     fn partial_cmp(&self, other: &r32) -> Option<Ordering> {
@@ -333,10 +338,14 @@ impl Identity for r64 {
     fn identity() -> Self { Self::new(true, 1, 1) }
 }
 impl Sqroot for r64 {
-    fn sqroot(&self) -> Self {
-        let surd = self.surd_sqrt();
-        surd.coef() * Self::from((surd.radicand() as f64).sqrt())
+    type Output = surd64;
+    fn sqroot(&self) -> surd64 {
+        self.surd_sqrt()
     }
+}
+impl Magnitude for r64 {
+    type Output = r64;
+    fn mag(&self) -> r64 { self.abs() }
 }
 impl PartialOrd for r64 {
     fn partial_cmp(&self, other: &r64) -> Option<Ordering> {

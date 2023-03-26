@@ -1,7 +1,9 @@
 use std::f32::consts::PI;
 use std::str::FromStr;
 
-use crate::geom::{vector::*, matrix::*, quaternion::{Quaternion, DualQuaternion}};
+use crate::{geom::{vector::*, matrix::*, quaternion::{Quaternion, DualQuaternion}}, RotationOrder};
+use crate::num::Magnitude;
+
 fn equal_ish(a: f32, b: f32, d: f32) -> bool {
     (a - b).abs() < d
 }
@@ -145,6 +147,10 @@ fn inverse_test() {
     //eprintln!("{}", m.lu().unwrap().0);
     //eprintln!("{}", m.inverse().unwrap());
     assert!(mat_equal_ish(m.inverse().unwrap(), m2, 0.001));
+    let dq = DualQuaternion::from_translate_rotate(Vector::<3>::new([2.0, 3.0, 5.0]), Quaternion::from_euler(0.5, 0.4, 0.3, RotationOrder::xyz())).normalise();
+    let point = Vector::<4>::new([5.0, 4.0, 3.0, 1.0]);
+    eprintln!("{:?}\n{:?}", dq, dq * dq.inverse() * dq);
+    assert!(vec_equal_ish(point, dq.inverse().transform(dq.transform(point)), 0.0001));
 }
 
 //Matrix Det
