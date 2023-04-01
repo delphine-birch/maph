@@ -91,3 +91,23 @@ where T: Absolute<Output=Q> {
     type Output = Q;
     fn mag(&self) -> Q { self.absolute() }
 }
+
+pub trait Round {
+    type Output;
+    fn tround(&self) -> Self::Output;
+    fn tceil(&self) -> Self::Output;
+    fn tfloor(&self) -> Self::Output;
+}
+
+impl Round for f64 { type Output = f64;   fn tround(&self) -> Self { self.round() } fn tceil(&self) -> Self { self.ceil() } fn tfloor(&self) -> Self { self.floor() } }
+impl Round for f32 { type Output = f32;   fn tround(&self) -> Self { self.round() } fn tceil(&self) -> Self { self.ceil() } fn tfloor(&self) -> Self { self.floor() } }
+impl Round for u128 { type Output = u128; fn tround(&self) -> Self { *self        } fn tceil(&self) -> Self { *self       } fn tfloor(&self) -> Self { *self        } }
+impl Round for u64 { type Output = u64;   fn tround(&self) -> Self { *self        } fn tceil(&self) -> Self { *self       } fn tfloor(&self) -> Self { *self        } }
+impl Round for u32 { type Output = u32;   fn tround(&self) -> Self { *self        } fn tceil(&self) -> Self { *self       } fn tfloor(&self) -> Self { *self        } }
+impl Round for u16 { type Output = u16;   fn tround(&self) -> Self { *self        } fn tceil(&self) -> Self { *self       } fn tfloor(&self) -> Self { *self        } }
+impl Round for u8 { type Output = u8;     fn tround(&self) -> Self { *self        } fn tceil(&self) -> Self { *self       } fn tfloor(&self) -> Self { *self        } }
+impl Round for i128 { type Output = i128; fn tround(&self) -> Self { *self        } fn tceil(&self) -> Self { *self       } fn tfloor(&self) -> Self { *self        } }
+impl Round for i64 { type Output = i64;   fn tround(&self) -> Self { *self        } fn tceil(&self) -> Self { *self       } fn tfloor(&self) -> Self { *self        } }
+impl Round for i32 { type Output = i32;   fn tround(&self) -> Self { *self        } fn tceil(&self) -> Self { *self       } fn tfloor(&self) -> Self { *self        } }
+impl Round for i16 { type Output = i16;   fn tround(&self) -> Self { *self        } fn tceil(&self) -> Self { *self       } fn tfloor(&self) -> Self { *self        } }
+impl Round for i8 { type Output = i8;     fn tround(&self) -> Self { *self        } fn tceil(&self) -> Self { *self       } fn tfloor(&self) -> Self { *self        } }
