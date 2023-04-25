@@ -4,7 +4,8 @@ use std::fmt::Display;
 use std::collections::{HashMap, HashSet};
 use std::f32::consts::PI;
 use bimap::BiHashMap;
-use crate::num::{Identity, Sqroot, rational::*};
+use crate::num::surd::surd32;
+use crate::num::{Identity, Sqroot, rational::*, Magnitude};
 use super::matrix::*;
 
 
@@ -79,12 +80,14 @@ impl<const L: usize> Vector<L> {
         for i in 0..L { sum += self[i]*self[i] }
         sum
     }
-    ///Returns the magnitude of the vector.
-    pub fn mag(&self) -> f32 {
-        self.sq_sum().sqrt()
-    }
     ///Returns a normalised copy of the vector.
     pub fn normalised(&self) -> Self { *self/self.mag() }
+}
+impl<const L: usize> Magnitude for Vector<L> {
+    type Output = f32;
+    fn mag(&self) -> f32 {
+        self.sq_sum().sqrt()
+    }
 }
 
 impl<const L: usize> Display for Vector<L> {
@@ -213,12 +216,14 @@ impl<const L: usize> VectorPrecise<L> {
         for i in 0..L { sum += self[i]*self[i] }
         sum
     }
-    ///Returns the magnitude of the vector.
-    pub fn mag(&self) -> r32 {
+    ///Returns a normalised copy of the vector.
+    pub fn normalised(&self) -> Self { *self/r32::from(self.mag()) }
+}
+impl<const L: usize> Magnitude for VectorPrecise<L> {
+    type Output = surd32;
+    fn mag(&self) -> surd32 {
         self.sq_sum().sqroot()
     }
-    ///Returns a normalised copy of the vector.
-    pub fn normalised(&self) -> Self { *self/self.mag() }
 }
 impl<const L: usize> From<Vector<L>> for VectorPrecise<L> {
     fn from(v: Vector<L>) -> Self {

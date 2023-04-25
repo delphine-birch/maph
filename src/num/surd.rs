@@ -30,6 +30,26 @@ impl surd32 {
     ///Returns the squared surd as a rational number - surds squared are always rational.
     pub fn squared(&self) -> r32 { (self * self).rational().expect("A squared surd should always return a rational number.") }
 }
+impl From<f32> for surd32 {
+    fn from(other: f32) -> Self {
+        Self::new(r32::from(other), 1)
+    }   
+}
+impl From<surd32> for f32 {
+    fn from(other: surd32) -> f32 {
+        f32::from(other.coef) * (other.radicand as f32).sqrt()
+    }
+}
+impl From<r32> for surd32 {
+    fn from(other: r32) -> Self {
+        Self::new(other, 1)
+    }
+}
+impl From<surd32> for r32 {
+    fn from(other: surd32) -> Self {
+        other.coef * r32::from((other.radicand as f32).sqrt())
+    }
+}
 impl Display for surd32 {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         write!(f, "({})*sqrt({})", self.coef, self.radicand)
@@ -127,6 +147,26 @@ impl surd64 {
     }}
     ///Returns the squared surd as a rational number - surds squared are always rational.
     pub fn squared(&self) -> r64 { (self * self).rational().expect("A squared surd should always return a rational number.") }
+}
+impl From<f64> for surd64 {
+    fn from(other: f64) -> Self {
+        Self::new(r64::from(other), 1)
+    }   
+}
+impl From<surd64> for f64 {
+    fn from(other: surd64) -> f64 {
+        f64::from(other.coef) * (other.radicand as f64).sqrt()
+    }
+}
+impl From<r64> for surd64 {
+    fn from(other: r64) -> Self {
+        Self::new(other, 1)
+    }
+}
+impl From<surd64> for r64 {
+    fn from(other: surd64) -> Self {
+        other.coef * r64::from((other.radicand as f64).sqrt())
+    }
 }
 impl Display for surd64 {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
