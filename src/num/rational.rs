@@ -125,7 +125,7 @@ impl From<f32> for r32 {
             true => (true, frac),
             false => (false, -frac),
         };
-        let n = dec.to_string().len();
+        let n = dec.to_string().len().min(u16::MAX as usize);
         let t = 10_u32.pow(n as u32);
         r32::new(sign, (f*(t as f32)).round() as u32, t)
     }

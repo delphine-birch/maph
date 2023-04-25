@@ -1,6 +1,6 @@
 [package]
 name = "maph"
-version = "0.7.6"
+version = "0.7.7"
 edition = "2021"
 license = "MIT"
 description = "Maths package for use with personal stuff, but like, you can totally use it! If you want! There's even some light documentation now!"
