@@ -73,6 +73,11 @@ pub mod quaternion {
     ///Returns the Identity Quaternion.
     pub fn quaternion_identity() -> Vector<4> { Vector::<4>::new([0.0, 0.0, 0.0, 1.0]) }
 
+    ///Returns the Conjugate of a Quaternion.
+    pub fn quaternion_conjugate(q: Vector<4>) -> Vector<4> {
+        Vector::<4>::new([-q[0], -q[1], -q[2], q[3]])
+    }
+
     ///Composes two Quaternions.
     pub fn compose(r: Vector<4>, s: Vector<4>) -> Vector<4> {
         Vector::<4>::new([

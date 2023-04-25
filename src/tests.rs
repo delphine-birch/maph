@@ -212,8 +212,14 @@ fn transformation_test() {
     let translation = Vector::<3>::new([0.0, 2.0, 0.0]);
     let trs = crate::geom::transforms::transform_mat::from_trs(translation, crate::geom::transforms::quaternion::from_euler(rotation[0], rotation[1], rotation[2], crate::geom::transforms::RotationOrder::xyz()), scale);
     let new_point = trs * point;
-    eprintln!("{}, {}", new_point, trs);
+    //eprintln!("{}, {}", new_point, trs);
     assert!(Vector::<3>::new([new_point[0], new_point[1], new_point[2]]).mag() < 0.001);
+    let scaled_point = Vector::<4>::new([2.0, 0.0, 0.0, 1.0]);
+    let dual_quat = crate::geom::dualquat::DualQuat::from_rotate_translate(crate::geom::transforms::quaternion::from_euler(rotation[0], rotation[1], rotation[2], crate::geom::transforms::RotationOrder::xyz()), translation);
+    let dual_rot = crate::geom::dualquat::DualQuat::from_quat(crate::geom::transforms::quaternion::from_euler(rotation[0], rotation[1], rotation[2], crate::geom::transforms::RotationOrder::xyz()));
+    let dual_trans = crate::geom::dualquat::DualQuat::from_translate(translation);
+    let dual_point = dual_quat.transform(scaled_point);
+    assert!(Vector::<3>::new([dual_point[0], dual_point[1], dual_point[2]]).mag() < 0.001);
 }
 
 //Projection

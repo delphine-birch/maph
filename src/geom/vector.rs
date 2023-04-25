@@ -291,6 +291,17 @@ impl<const L: usize> Div<VectorPrecise<L>> for VectorPrecise<L> {
     fn div(self, other: VectorPrecise<L>) -> Self { self * other.recip() }
 }
 
+impl Vector<2> {
+    pub fn heading(&self) -> f32 {
+        self.data[1].atan2(self.data[0])
+    }
+}
+impl VectorPrecise<2> {
+    pub fn heading(&self) -> r32 {
+        r32::from(f32::from(self.data[1]).atan2(f32::from(self.data[0])))
+    }
+}
+
 ///A basic graph type based on N-dimensional vectors - uses VectorPrecise for Hashable
 ///vector coordinates.
 ///Automatically uses distance between vectors for weighting.
@@ -390,6 +401,27 @@ impl<const N: usize> VectorGraph<N> {
             _ => false,
         }
     }
+    fn get_point_index(&self, v: Vector<N>) -> Option<usize> {
+        match self.points.get_by_right(&VectorPrecise::from(v)) {
+            Some(id) => Some(*id),
+            None => None,
+        }
+    }
+    ///Checks if two points are connected in either direction.
+    pub fn is_connected(&self, a: Vector<N>, b: Vector<N>) -> bool {
+        match (self.get_point_index(a), self.get_point_index(b)) {
+            (Some(a), Some(b)) => {
+                if let Some(v) = self.connections.get(&a) {
+                    if v.contains(&b) { return true; }
+                } 
+                if let Some(v) = self.connections.get(&b) {
+                    if v.contains(&a) { return true; }
+                }
+                return false;
+            },
+            _ => false,
+        }
+    }
     ///Returns an option containing a vector of all points connected to the point. This will return
     ///None if the point is not found in the graph, but will still return an option containing an empty vector
     ///if the point is found and simply has no connections.
@@ -401,7 +433,9 @@ impl<const N: usize> VectorGraph<N> {
                         Some(points.iter()
                             .map(|i| self.points.get_by_left(i))
                             .filter(|o| o.is_some())
-                            .map(|o| o.unwrap())
+                            .map(|o| *o.unwrap())
+                            .collect::<HashSet<_>>()
+                            .iter()
                             .map(|hv| Vector::from(*hv))
                             .collect::<Vec<_>>()    
                         )
