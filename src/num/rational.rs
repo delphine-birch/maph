@@ -125,9 +125,10 @@ impl From<f32> for r32 {
             true => (true, frac),
             false => (false, -frac),
         };
-        let n = dec.to_string().len();
-        let t = 10_u32.pow(n as u32);
-        r32::new(sign, (f*(t as f32)).round() as u32, t)
+        let n = dec.to_string().len().min(u16::MAX as usize);
+        let m = 10.0_f64.powf(n as f64);
+        let nf = f as f64 * m;
+        Self::new_raw(sign, nf.round() as u32, m.round() as u32)
     }
 }
 impl From<(i32, i32)> for r32 {
