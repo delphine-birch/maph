@@ -1,6 +1,6 @@
 [package]
 name = "maph"
-version = "0.7.8"
+version = "0.8.0"
 edition = "2021"
 license = "MIT"
 description = "Maths package for use with personal stuff, but like, you can totally use it! If you want! There's even some light documentation now!"
@@ -19,3 +19,8 @@ criterion = "0.4"
 [[bench]]
 name = "rationals"
 harness = false
+debug = true
+
+[profile.release-with-debug]
+inherits = "release"
+debug = true

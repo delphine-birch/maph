@@ -1,6 +1,7 @@
 pub mod geom;
 pub mod num;
 pub mod cg;
+pub mod bit;
 #[cfg(test)]
 pub mod tests;
 
@@ -29,5 +30,5 @@ pub type Float3 = cg::Float3;
 pub type Float4 = cg::Float4;
 #[allow(non_camel_case_types)]
 pub type r32 = num::rational::r32;
-#[allow(non_camel_case_types)]
-pub type r64 = num::rational::r64;
+//#[allow(non_camel_case_types)]
+//pub type r64 = num::rational::r64;

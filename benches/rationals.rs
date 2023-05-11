@@ -16,13 +16,13 @@ fn div_test<T: std::ops::Div<Output=T>>(a: T, b: T) -> T {
 fn criterion_benchmark(c: &mut Criterion) {
     let mut floats = [0.0; 1000];
     let mut floats0 = [0.0; 1000];
-    let mut rats = [maph::r32::new(true, 1, 1); 1000];
-    let mut rats0 = [maph::r32::new(true, 1, 1); 1000];
+    let mut rats = [maph::r32::new(1, 1).unwrap(); 1000];
+    let mut rats0 = [maph::r32::new(1, 1).unwrap(); 1000];
     for i in 0..1000 {
         let af = i as f32 / (i + 1) as f32;
         let bf = (i + 2) as f32 / (i + 3) as f32;
-        let ar = maph::r32::from((i, i + 1));
-        let br = maph::r32::from((i + 2, i + 3));
+        let ar = maph::r32::new_unchecked(i, i + 1);
+        let br = maph::r32::new_unchecked(i + 2, i + 3);
         floats[i as usize] = af; floats0[i as usize] = bf;
         rats[i as usize] = ar; rats0[i as usize] = br;
     }

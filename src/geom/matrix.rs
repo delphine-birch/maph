@@ -1,7 +1,7 @@
 use std::ops::{Mul, Index, IndexMut};
 use std::fmt; 
 use std::fmt::Display;
-use crate::num::{Identity, rational::*};
+use crate::num::{Identity, rational::*, Absolute};
 use super::vector::*;
 
 ///Matrix Type - R rows, C columns, components are f32. Stored in row-major format,
@@ -539,7 +539,7 @@ impl<const L: usize> MatrixPrecise<L, L> {
                 let diag = *self * adjoint;
                 let det = diag[0][0];
                 if det == r32::default() { return None; }
-                else { return Some(adjoint * det.reciprocal()); }
+                else { return Some(adjoint * det.reciprocal().unwrap()); }
             },
             None => None,
         }
@@ -663,7 +663,7 @@ impl<const L: usize> MatrixPrecise<L, L> {
     ///Attempts to calculate an inverse matrix for this matrix using LUP substitution. This will
     ///fail if a LUP decomposition cannot be found for the matrix.
     pub fn lup_inverse(&self) -> Option<MatrixPrecise<L, L>> {
-        if let Some(d) = self.lup_det() { if d.abs() < r32::default() { return None; } }
+        if let Some(d) = self.lup_det() { if d.absolute() < r32::default() { return None; } }
         let mut columns = [VectorPrecise::<L>::default(); L];
         let identity = Self::identity();
         for i in 0..L {

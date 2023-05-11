@@ -1,5 +1,4 @@
 use std::f32::consts::PI;
-use std::str::FromStr;
 
 use crate::{geom::{vector::*, matrix::*, quaternion::{Quaternion, DualQuaternion}}, RotationOrder};
 use crate::num::Magnitude;
@@ -22,9 +21,14 @@ fn mat_equal_ish<const R: usize, const C: usize>(a: Matrix<R, C>, b: Matrix<R, C
 #[test]
 fn rational_test() {
     use crate::num::rational::*;
-    assert!(format!("{}", r32::from_str("-0.3").unwrap()) == "-3/10");
+
+    let n = r32::from(1234.923456);
+    eprintln!("{}", n);
+
     let a = (Vector::<3>::new([0.1, 0.2, 0.3]), Vector::<3>::new([0.4, 0.5, 0.6]), Vector::<3>::new([0.7, 0.8, 0.9]));
     let b = (VectorPrecise::<3>::new([r32::from(0.1), r32::from(0.2), r32::from(0.3)]), VectorPrecise::<3>::new([r32::from(0.4), r32::from(0.5), r32::from(0.6)]), VectorPrecise::<3>::new([r32::from(0.7), r32::from(0.8), r32::from(0.9)]));
+    //eprintln!("{}", b.1 + b.2);
+    //eprintln!("{}, {}", a.0*(a.1 + a.2)/a.1, b.0*(b.1 + b.2)/b.1);
     assert!(vec_equal_ish(a.0*(a.1 + a.2)/a.1, Vector::<3>::from(b.0*(b.1 + b.2)/b.1), 0.0001));
 }
 #[test]
@@ -39,8 +43,8 @@ fn factor_test() {
 #[test]
 fn sqrt_test() {
     use crate::num::rational::*;
-    eprintln!("{}", r32::from((25, 7)).surd_sqrt());
-    assert!(r32::from((25, 7)).surd_sqrt().squared() == r32::from((25, 7)));
+    eprintln!("{}", r32::new_unchecked(25, 7).surd_sqrt());
+    assert!(r32::new_unchecked(25, 7).surd_sqrt().squared() == r32::new_unchecked(25, 7));
 }
 #[test]
 fn quaternion_composition() {
@@ -239,4 +243,14 @@ fn matrix_identity() {
     let mat1 = Matrix::<3, 3>::new([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0 , 0.0, 1.0]]);
     let mat2 = Matrix::<3, 1>::new([[4.0], [5.0], [6.0]]);
     assert!(mat1.multiply(mat2) == mat2);
+}
+
+//Bit Tests
+#[test]
+fn bit_test() {
+    let f = crate::bit::sesp(-125.24);
+    eprintln!("{}, {}, {}", f.0, f.1, f.2);
+    assert!(!f.0);
+    assert!(f.1 == 133);
+    assert!(f.2 == 8026849);
 }
